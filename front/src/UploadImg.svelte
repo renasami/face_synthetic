@@ -1,9 +1,11 @@
 <script lang="ts">
+    import {convertedImages} from "./store"
 	let file
-    let src
+    let img
 	const reader = new FileReader();
 	reader.onload = () => {
-        src = reader.result;
+        img = reader.result;
+        storeUpdate(img)
 	};
 	reader.onerror = (error) => {
 	  console.log('Error: ', error);
@@ -11,6 +13,9 @@
 	const convertToBase64 = () => {
 		reader.readAsDataURL(file[0]);
 	}
+    const storeUpdate = (img:string | ArrayBuffer) => {
+        convertedImages.update((imgs) => [...imgs,img])
+    };
 
 </script>
 <div>
