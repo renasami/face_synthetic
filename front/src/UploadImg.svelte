@@ -1,11 +1,12 @@
 <script lang="ts">
     import {convertedImages} from "./store"
+	export let index
 	let file
     let img
 	const reader = new FileReader();
 	reader.onload = () => {
         img = reader.result;
-        storeUpdate(img)
+        storeUpdate(img,index)
 	};
 	reader.onerror = (error) => {
 	  console.log('Error: ', error);
@@ -13,8 +14,14 @@
 	const convertToBase64 = () => {
 		reader.readAsDataURL(file[0]);
 	}
-    const storeUpdate = (img:string | ArrayBuffer) => {
-        convertedImages.update((imgs) => [...imgs,img])
+    const storeUpdate = (img:string | ArrayBuffer,index) => {
+		
+			convertedImages.update((imgs) => {
+				let arr =[...imgs]
+				arr[index] = img
+				return arr
+			})
+			return
     };
 
 </script>

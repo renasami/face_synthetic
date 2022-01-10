@@ -453,9 +453,9 @@ var app = (function () {
     			input = element("input");
     			attr_dev(input, "id", "1");
     			attr_dev(input, "type", "file");
-    			add_location(input, file_1, 19, 1, 430);
+    			add_location(input, file_1, 25, 1, 542);
     			attr_dev(div, "class", "svelte-1oj4nq0");
-    			add_location(div, file_1, 18, 0, 423);
+    			add_location(div, file_1, 24, 0, 535);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -466,7 +466,7 @@ var app = (function () {
 
     			if (!mounted) {
     				dispose = [
-    					listen_dev(input, "change", /*input_change_handler*/ ctx[2]),
+    					listen_dev(input, "change", /*input_change_handler*/ ctx[3]),
     					listen_dev(input, "change", /*convertToBase64*/ ctx[1], false, false, false)
     				];
 
@@ -497,13 +497,14 @@ var app = (function () {
     function instance$1($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('UploadImg', slots, []);
+    	let { index } = $$props;
     	let file;
     	let img;
     	const reader = new FileReader();
 
     	reader.onload = () => {
     		img = reader.result;
-    		storeUpdate(img);
+    		storeUpdate(img, index);
     	};
 
     	reader.onerror = error => {
@@ -514,11 +515,17 @@ var app = (function () {
     		reader.readAsDataURL(file[0]);
     	};
 
-    	const storeUpdate = img => {
-    		convertedImages.update(imgs => [...imgs, img]);
+    	const storeUpdate = (img, index) => {
+    		convertedImages.update(imgs => {
+    			let arr = [...imgs];
+    			arr[index] = img;
+    			return arr;
+    		});
+
+    		return;
     	};
 
-    	const writable_props = [];
+    	const writable_props = ['index'];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$1.warn(`<UploadImg> was created with unknown prop '${key}'`);
@@ -529,8 +536,13 @@ var app = (function () {
     		$$invalidate(0, file);
     	}
 
+    	$$self.$$set = $$props => {
+    		if ('index' in $$props) $$invalidate(2, index = $$props.index);
+    	};
+
     	$$self.$capture_state = () => ({
     		convertedImages,
+    		index,
     		file,
     		img,
     		reader,
@@ -539,6 +551,7 @@ var app = (function () {
     	});
 
     	$$self.$inject_state = $$props => {
+    		if ('index' in $$props) $$invalidate(2, index = $$props.index);
     		if ('file' in $$props) $$invalidate(0, file = $$props.file);
     		if ('img' in $$props) img = $$props.img;
     	};
@@ -547,13 +560,13 @@ var app = (function () {
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	return [file, convertToBase64, input_change_handler];
+    	return [file, convertToBase64, index, input_change_handler];
     }
 
     class UploadImg extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$1, create_fragment$1, safe_not_equal, {});
+    		init(this, options, instance$1, create_fragment$1, safe_not_equal, { index: 2 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
@@ -561,6 +574,21 @@ var app = (function () {
     			options,
     			id: create_fragment$1.name
     		});
+
+    		const { ctx } = this.$$;
+    		const props = options.props || {};
+
+    		if (/*index*/ ctx[2] === undefined && !('index' in props)) {
+    			console_1$1.warn("<UploadImg> was created without expected prop 'index'");
+    		}
+    	}
+
+    	get index() {
+    		throw new Error("<UploadImg>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set index(value) {
+    		throw new Error("<UploadImg>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
 
@@ -580,8 +608,8 @@ var app = (function () {
     	let current;
     	let mounted;
     	let dispose;
-    	uploadimg0 = new UploadImg({ $$inline: true });
-    	uploadimg1 = new UploadImg({ $$inline: true });
+    	uploadimg0 = new UploadImg({ props: { index: "0" }, $$inline: true });
+    	uploadimg1 = new UploadImg({ props: { index: "1" }, $$inline: true });
 
     	const block = {
     		c: function create() {
@@ -594,8 +622,8 @@ var app = (function () {
     			button = element("button");
     			button.textContent = "Upload";
     			attr_dev(main, "class", "svelte-q4m8sw");
-    			add_location(main, file, 6, 0, 176);
-    			add_location(button, file, 11, 1, 222);
+    			add_location(main, file, 10, 0, 308);
+    			add_location(button, file, 15, 1, 371);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -661,6 +689,11 @@ var app = (function () {
     	const upload = () => {
     		console.log($convertedImages);
     	};
+
+    	if ($convertedImages.length == 0) {
+    		convertedImages.update(() => Array(2).map(_ => null));
+    		console.log($convertedImages);
+    	}
 
     	const writable_props = [];
 
