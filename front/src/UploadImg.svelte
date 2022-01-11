@@ -6,7 +6,10 @@
 	const reader = new FileReader();
 	reader.onload = () => {
         img = reader.result;
-        storeUpdate(img,index)
+		const fileData = img.replace(/^data:\w+\/\w+;base64,/, '')
+		// const decodedFile = new Buffer(fileData, 'base64')
+		console.log(fileData)
+        storeUpdate(fileData,index)
 	};
 	reader.onerror = (error) => {
 	  console.log('Error: ', error);
